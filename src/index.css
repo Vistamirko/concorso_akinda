@@ -1,0 +1,195 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --bg-color: #0c1220;
+  --bg-secondary: #131b2e;
+  --card-bg: rgba(255, 255, 255, 0.03);
+  --glass-bg: rgba(255, 255, 255, 0.02);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  --accent-color: #0070f3;
+  --accent-glow: rgba(0, 112, 243, 0.2);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --transition: all 0.3s ease;
+  --border-radius: 12px;
+}
+
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--bg-color) !important;
+  color: var(--text-primary) !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  letter-spacing: -0.01em;
+}
+
+.App {
+  padding-bottom: 5rem;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 10px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Premium Enterprise Card */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--glass-shadow);
+  padding: 2.5rem;
+  transition: var(--transition);
+  position: relative;
+}
+
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Institutional Typography */
+h1, .h1-premium {
+  font-weight: 700;
+  font-size: 3rem;
+  color: #fff;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.5rem;
+}
+
+h2 {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+/* Navbar Professional */
+.navbar {
+  background: rgba(12, 18, 32, 0.9) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 1rem 0;
+  margin-bottom: 3rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-link {
+  color: var(--text-secondary) !important;
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 0.5rem 1.25rem !important;
+  transition: var(--transition);
+}
+
+.nav-link:hover {
+  color: #fff !important;
+}
+
+/* Dashboard Metrics */
+.badge-premium {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Solid Professional Button */
+.btn-primary {
+  background: #fff !important;
+  color: #000 !important;
+  border-radius: 8px !important;
+  padding: 0.75rem 1.75rem !important;
+  font-weight: 600 !important;
+  border: none !important;
+  transition: var(--transition) !important;
+  font-size: 0.85rem;
+}
+
+.btn-primary:hover {
+  background: #e2e8f0 !important;
+  transform: translateY(-2px);
+}
+
+/* Professional Tables */
+.table {
+  --bs-table-bg: transparent !important;
+  --bs-table-color: var(--text-primary) !important;
+  color: var(--text-primary) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  margin-bottom: 0;
+}
+
+.table th, .table td {
+  color: var(--text-primary) !important;
+  background-color: transparent !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  text-decoration: none !important;
+}
+
+.table thead th {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 1rem 1.5rem !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.table tbody td {
+  padding: 1.25rem 1.5rem !important;
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+/* Global Reset for professional look */
+a {
+  text-decoration: none !important;
+  transition: var(--transition);
+}
+
+a:hover {
+  text-decoration: none !important;
+  opacity: 0.8;
+}
+
+/* Minimal Hero Glow */
+.hero-glow {
+    position: absolute;
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(0, 112, 243, 0.05) 0%, transparent 70%);
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: -1;
+}
