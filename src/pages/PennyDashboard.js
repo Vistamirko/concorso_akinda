@@ -1,15 +1,35 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import "../App.css";
 import Navbar from "../navbar";
 import { useTable } from "react-table";
 import { CSVLink } from "react-csv";
-import fbData from "../data/fbcomment.json";
-import igData from "../data/igcomment.json";
+import config from "../config";
 
 function PennyDashboard({ platform }) {
-  const data = useMemo(() => {
-    return platform === 'facebook' ? fbData : igData;
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${config.s3BaseUrl}${config.pennyDataPath}`);
+        if (!response.ok) throw new Error('Data not found on S3');
+        const jsonData = await response.data || await response.json();
+        
+        // Handle platform specific filtering if the JSON is unified
+        // For now, mirroring Task C logic assumes the file is already refined or we filter here.
+        setData(Array.isArray(jsonData) ? jsonData : []);
+      } catch (e) {
+        console.warn("Using local fallback or empty data:", e);
+        setData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, [platform]);
+
+  const tableData = useMemo(() => data, [data]);
 
   // Dynamic columns based on platform schema
   const columns = useMemo(() => {

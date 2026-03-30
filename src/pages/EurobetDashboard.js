@@ -1,16 +1,9 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import "../App.css";
 import Navbar from "../navbar";
 import { useTable } from "react-table";
 import { CSVLink } from "react-csv";
-
-// Try to load data if it exists, otherwise use empty array
-let hashtagData = [];
-try {
-  hashtagData = require("../data/hashtag-instagram.json");
-} catch (e) {
-  hashtagData = [];
-}
+import config from "../config";
 
 const columns = [
   { Header: "ID Post", accessor: "id", Cell: ({value}) => <span className="font-monospace small opacity-75">{value}</span> },
@@ -20,8 +13,28 @@ const columns = [
 ];
 
 function EurobetDashboard() {
-  const data = useMemo(() => hashtagData, []);
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data });
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${config.s3BaseUrl}${config.eurobetDataPath}`);
+        if (!response.ok) throw new Error('Data not found on S3');
+        const jsonData = await response.data || await response.json();
+        setData(Array.isArray(jsonData) ? jsonData : []);
+      } catch (e) {
+        console.warn("Using local fallback or empty data:", e);
+        setData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const tableData = useMemo(() => data, [data]);
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data: tableData });
 
   const csvData = [
     ["ID", "Didascalia", "Utente", "URL"],

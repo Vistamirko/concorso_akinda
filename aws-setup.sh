@@ -26,7 +26,10 @@ CORS_POLICY='{
     {
       "AllowedHeaders": ["*"],
       "AllowedMethods": ["GET"],
-      "AllowedOrigins": ["'$VERCEL_DOMAIN'"],
+      "AllowedOrigins": [
+        "https://concorsi-penny-social.it",
+        "https://concorso-akinda.vercel.app"
+      ],
       "ExposeHeaders": []
     }
   ]
