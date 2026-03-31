@@ -7,7 +7,6 @@ import config from "../config";
 
 function PennyDashboard({ platform }) {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,14 +21,11 @@ function PennyDashboard({ platform }) {
       } catch (e) {
         console.warn("Using local fallback or empty data:", e);
         setData([]);
-      } finally {
-        setLoading(false);
       }
     };
     fetchData();
   }, [platform]);
 
-  const tableData = useMemo(() => data, [data]);
 
   // Dynamic columns based on platform schema
   const columns = useMemo(() => {

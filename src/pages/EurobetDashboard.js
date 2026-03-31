@@ -14,8 +14,6 @@ const columns = [
 
 function EurobetDashboard() {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -26,8 +24,6 @@ function EurobetDashboard() {
       } catch (e) {
         console.warn("Using local fallback or empty data:", e);
         setData([]);
-      } finally {
-        setLoading(false);
       }
     };
     fetchData();
