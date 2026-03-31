@@ -31,10 +31,10 @@ function PennyDashboard({ platform }) {
   const columns = useMemo(() => {
     if (platform === 'facebook') {
       return [
-        { Header: "ID", accessor: "Id", Cell: ({value}) => <span className="opacity-50 small font-monospace">{value}</span> },
-        { Header: "Nome Utente", accessor: "Name", Cell: ({value}) => <span className="fw-bold">{value}</span> },
-        { Header: "Data", accessor: "Data", Cell: ({value}) => <span className="opacity-50 small">{value}</span> },
-        { Header: "Commento", accessor: "Comment", Cell: ({value}) => <div className="text-white text-opacity-75">{value}</div> },
+        { Header: "ID", accessor: "id", Cell: ({value}) => <span className="opacity-50 small font-monospace">{value}</span> },
+        { Header: "Nome Utente", accessor: "name", Cell: ({value}) => <span className="fw-bold">{value}</span> },
+        { Header: "Data", accessor: "date", Cell: ({value}) => <span className="opacity-50 small">{value}</span> },
+        { Header: "Commento", accessor: "text", Cell: ({value}) => <div className="text-white text-opacity-75">{value}</div> },
       ];
     } else {
       return [
