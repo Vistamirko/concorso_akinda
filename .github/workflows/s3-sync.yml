@@ -24,4 +24,4 @@ jobs:
 
     - name: Sync src/data to S3
       run: |
-        aws s3 sync src/data/ s3://${{ secrets.AWS_S3_BUCKET }}/data/ --delete
+        aws s3 sync src/data/ s3://${{ secrets.AWS_S3 }}/data/ --delete --cache-control "max-age=0,no-cache,no-store,must-revalidate"
