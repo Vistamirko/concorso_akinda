@@ -4,7 +4,7 @@ const config = {
     
     // Percorsi dinamici dei file JSON (Sincronizzati da GitHub)
     eurobetDataPath: "/data/hashtag-instagram.json",
-    pennyDataPath: "/data/hashtag-facebook.json",
+    pennyDataPath: "/data/fbcomment.json",
     
     // Altri percorsi per archivi storici
     igCommentPath: "/data/igcomment.json",

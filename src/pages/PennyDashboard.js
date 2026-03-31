@@ -11,30 +11,29 @@ function PennyDashboard({ platform }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${config.s3BaseUrl}${config.pennyDataPath}`);
+        const dataPath = platform === "instagram" ? config.igCommentPath : config.pennyDataPath;
+        const response = await fetch(`${config.s3BaseUrl}${dataPath}`);
         if (!response.ok) throw new Error('Data not found on S3');
-        const jsonData = await response.data || await response.json();
+        const jsonData = await response.json();
         
         // Handle platform specific filtering if the JSON is unified
-        // For now, mirroring Task C logic assumes the file is already refined or we filter here.
         setData(Array.isArray(jsonData) ? jsonData : []);
       } catch (e) {
-        console.warn("Using local fallback or empty data:", e);
+        console.warn("Using local fallback or empty data:", (e instanceof Error) ? e.message : e);
         setData([]);
       }
     };
     fetchData();
   }, [platform]);
 
-
   // Dynamic columns based on platform schema
   const columns = useMemo(() => {
     if (platform === 'facebook') {
       return [
-        { Header: "ID", accessor: "id", Cell: ({value}) => <span className="opacity-50 small font-monospace">{value}</span> },
-        { Header: "Nome Utente", accessor: "name", Cell: ({value}) => <span className="fw-bold">{value}</span> },
-        { Header: "Data", accessor: "date", Cell: ({value}) => <span className="opacity-50 small">{value}</span> },
-        { Header: "Commento", accessor: "text", Cell: ({value}) => <div className="text-white text-opacity-75">{value}</div> },
+        { Header: "ID", accessor: "Id", Cell: ({value}) => <span className="opacity-50 small font-monospace">{value}</span> },
+        { Header: "Nome Utente", accessor: "Name", Cell: ({value}) => <span className="fw-bold">{value}</span> },
+        { Header: "Data", accessor: "Data", Cell: ({value}) => <span className="opacity-50 small">{value}</span> },
+        { Header: "Commento", accessor: "Comment", Cell: ({value}) => <div className="text-white text-opacity-75">{value}</div> },
       ];
     } else {
       return [
