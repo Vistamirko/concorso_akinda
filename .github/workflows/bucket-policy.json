@@ -1,0 +1,22 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowGetObjectsFromAllowedReferers",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::penny-eurobet-storage-milan/*",
+            "Condition": {
+                "StringLike": {
+                    "aws:Referer": [
+                        "https://concorsi-penny-social.it/*",
+                        "https://concorso-akinda.vercel.app/*",
+                        "https://concorso-akinda-milano.vercel.app/*",
+                        "http://localhost:3000/*"
+                    ]
+                }
+            }
+        }
+    ]
+}

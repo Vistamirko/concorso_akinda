@@ -20,11 +20,10 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Debug Local Files
+    - name: Force Upload to S3
       run: |
-        echo "Listing contents of src/data/:"
-        ls -la src/data/
+        aws s3 cp src/data/ s3://${{ secrets.AWS_S3_BUCKET }}/data/ --recursive --cache-control "max-age=0,no-cache,no-store,must-revalidate"
 
-    - name: Force Upload to S3 (Verbose)
+    - name: Apply Security Policy (Referer Restriction)
       run: |
-        aws s3 cp src/data/ s3://${{ secrets.AWS_S3_BUCKET }}/data/ --recursive --cache-control "max-age=0,no-cache,no-store,must-revalidate" --debug
+        aws s3api put-bucket-policy --bucket ${{ secrets.AWS_S3_BUCKET }} --policy file://.github/workflows/bucket-policy.json
