@@ -6,10 +6,9 @@ import { CSVLink } from "react-csv";
 import config from "../config";
 
 const columns = [
-  { Header: "ID Post", accessor: "id", Cell: ({value}) => <span className="font-monospace small opacity-75">{value}</span> },
-  { Header: "Didascalia", accessor: "caption", Cell: ({value}) => <div className="text-truncate" style={{maxWidth: '300px'}}>{value}</div> },
-  { Header: "Autore", accessor: "fullName", Cell: ({value}) => <span className="fw-bold">{value}</span> },
-  { Header: "Sorgente", accessor: "url", Cell: ({value}) => <a href={value} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-light border-opacity-10 py-1 px-3" style={{fontSize: '0.7rem'}}>VEDI POST</a> },
+  { Header: "Nome Utente", accessor: "fullName", Cell: ({value}) => <span className="fw-bold">{value}</span> },
+  { Header: "Contenuto Post", accessor: "caption", Cell: ({value}) => <div className="text-truncate" style={{maxWidth: '400px'}}>{value}</div> },
+  { Header: "Link Post", accessor: "url", Cell: ({value}) => <a href={value} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-light border-opacity-10 py-1 px-3" style={{fontSize: '0.7rem'}}>VEDI SU IG</a> },
 ];
 
 function EurobetDashboard() {
@@ -73,7 +72,7 @@ function EurobetDashboard() {
             <div className="col-md-3">
                 <div className="glass-card text-center py-4">
                     <div className="text-secondary small fw-bold tracking-widest text-uppercase mb-2">Hashtag Attivo</div>
-                    <div className="h4 mb-0">#eurobet2026</div>
+                    <div className="h4 mb-0">#sentilapassionedalvivo</div>
                     <div className="small text-secondary mt-1">Monitoraggio IG</div>
                 </div>
             </div>

@@ -61,16 +61,26 @@ aws s3api put-public-access-block \
     --bucket $BUCKET_NAME \
     --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
 
-echo "--- 5. Setting Bucket Policy for public read-only (obfuscation) ---"
+echo "--- 5. Setting Bucket Policy for restricted read (Referer check) ---"
 BUCKET_POLICY='{
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "PublicReadGetObject",
+            "Sid": "AllowGetObjectsFromAllowedReferers",
             "Effect": "Allow",
             "Principal": "*",
             "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::'$BUCKET_NAME'/*"
+            "Resource": "arn:aws:s3:::'$BUCKET_NAME'/*",
+            "Condition": {
+                "StringLike": {
+                    "aws:Referer": [
+                        "https://concorsi-penny-social.it/*",
+                        "https://concorso-akinda.vercel.app/*",
+                        "https://concorso-akinda-milano.vercel.app/*",
+                        "http://localhost:3000/*"
+                    ]
+                }
+            }
         }
     ]
 }'

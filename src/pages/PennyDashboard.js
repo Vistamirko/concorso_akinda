@@ -30,17 +30,16 @@ function PennyDashboard({ platform }) {
   const columns = useMemo(() => {
     if (platform === 'facebook') {
       return [
-        { Header: "ID", accessor: "Id", Cell: ({value}) => <span className="opacity-50 small font-monospace">{value}</span> },
         { Header: "Nome Utente", accessor: "Name", Cell: ({value}) => <span className="fw-bold">{value}</span> },
-        { Header: "Data", accessor: "Data", Cell: ({value}) => <span className="opacity-50 small">{value}</span> },
-        { Header: "Commento", accessor: "Comment", Cell: ({value}) => <div className="text-white text-opacity-75">{value}</div> },
+        { Header: "Data e Ora", accessor: "Data", Cell: ({value}) => <span className="opacity-50 small">{value}</span> },
+        { Header: "Testo Commento", accessor: "Comment", Cell: ({value}) => <div className="text-white text-opacity-75">{value}</div> },
       ];
     } else {
       return [
-        { Header: "Username", accessor: "Username", Cell: ({value}) => <span className="fw-bold">{value}</span> },
-        { Header: "Orario Commento", accessor: "Date", Cell: ({value}) => <span className="opacity-50 small">{value}</span> },
-        { Header: "Contenuto", accessor: "CommentText", Cell: ({value}) => <div className="text-white text-opacity-75">{value}</div> },
-        { Header: "Link Social", accessor: "ProfileURL", Cell: ({value}) => <a href={value} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-light border-opacity-10 py-1 px-3" style={{fontSize: '0.7rem'}}>PROFILO</a> },
+        { Header: "Nome Utente", accessor: "Username", Cell: ({value}) => <span className="fw-bold">{value}</span> },
+        { Header: "Data e Ora", accessor: "Date", Cell: ({value}) => <span className="opacity-50 small">{value}</span> },
+        { Header: "Testo Commento", accessor: "CommentText", Cell: ({value}) => <div className="text-white text-opacity-75">{value}</div> },
+        { Header: "Link Profilo", accessor: "ProfileURL", Cell: ({value}) => <a href={value} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-light border-opacity-10 py-1 px-3" style={{fontSize: '0.7rem'}}>PROFILO</a> },
       ];
     }
   }, [platform]);
@@ -62,7 +61,7 @@ function PennyDashboard({ platform }) {
           <div className="col-12 col-md-8">
             <div className="badge-premium mb-3" style={{ background: 'rgba(0, 112, 243, 0.1)', color: '#0070f3' }}>Engagement {platform.toUpperCase()}</div>
             <h1 className="h1-premium mb-0">Penny Social Hub</h1>
-            <p className="text-secondary lead mt-2">Raccolta commenti e gestione estrazioni &bull; Post Mensili</p>
+            <p className="text-secondary lead mt-2">Raccolta commenti e gestione estrazioni &bull; Aprile - Giugno</p>
           </div>
           <div className="col-12 col-md-4 text-md-end">
             <CSVLink className="btn btn-primary" filename={`penny_${platform}_comments.csv`} data={csvData}>
@@ -72,23 +71,30 @@ function PennyDashboard({ platform }) {
         </div>
 
         <div className="row mb-5 g-4">
-            <div className="col-md-4">
+            <div className="col-md-3">
                 <div className="glass-card text-center py-4">
                     <div className="text-secondary small fw-bold tracking-widest text-uppercase mb-2">Commenti Totali</div>
                     <div className="h1-premium mb-0" style={{ fontSize: '2.5rem' }}>{data.length}</div>
                 </div>
             </div>
-            <div className="col-md-4">
+            <div className="col-md-3">
                 <div className="glass-card text-center py-4">
                     <div className="text-secondary small fw-bold tracking-widest text-uppercase mb-2">Campagna Attiva</div>
-                    <div className="h4 mb-0">POST #1 (APRILE)</div>
-                    <div className="small text-secondary mt-2">Termina: 30 APR</div>
+                    <div className="h4 mb-0">ESTRAZIONE #1</div>
+                    <div className="small text-secondary mt-2">Aprile</div>
                 </div>
             </div>
-            <div className="col-md-4">
+            <div className="col-md-3">
                 <div className="glass-card text-center py-4">
-                    <div className="text-secondary small fw-bold tracking-widest text-uppercase mb-2">Obiettivo Estrazioni</div>
-                    <div className="h3 mb-0">3 ROUNDS</div>
+                    <div className="text-secondary small fw-bold tracking-widest text-uppercase mb-2">Hashtag Monitorato</div>
+                    <div className="h5 mb-0" style={{ color: '#0070f3' }}>#prodottomisteriosoPENNY</div>
+                    <div className="small text-secondary mt-2">Ricerca commenti</div>
+                </div>
+            </div>
+            <div className="col-md-3">
+                <div className="glass-card text-center py-4">
+                    <div className="text-secondary small fw-bold tracking-widest text-uppercase mb-2">Obiettivo</div>
+                    <div className="h4 mb-0">3 ROUNDS</div>
                     <div className="small text-secondary mt-1">1 al mese</div>
                 </div>
             </div>
