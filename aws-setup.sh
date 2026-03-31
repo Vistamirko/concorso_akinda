@@ -33,7 +33,9 @@ CORS_POLICY='{
       "AllowedMethods": ["GET"],
       "AllowedOrigins": [
         "https://concorsi-penny-social.it",
-        "https://concorso-akinda.vercel.app"
+        "https://concorso-akinda.vercel.app",
+        "https://concorso-akinda-milano.vercel.app",
+        "http://localhost:3000"
       ],
       "ExposeHeaders": []
     }
@@ -50,6 +52,7 @@ echo "--- 3. Ensuring folder structure: /eurobet/ and /penny/ ---"
 # Note: put-object just ensures the prefix exists by creating an empty object ending in /
 aws s3api put-object --bucket $BUCKET_NAME --key eurobet/ > /dev/null
 aws s3api put-object --bucket $BUCKET_NAME --key penny/ > /dev/null
+aws s3api put-object --bucket $BUCKET_NAME --key data/ > /dev/null
 
 # 4. Disable Public Access Block (to allow the public read-only policy)
 # Since 2023, S3 blocks public access by default. We must disable it to allow public-read policies.
