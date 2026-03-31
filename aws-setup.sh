@@ -11,12 +11,17 @@ VERCEL_DOMAIN="https://concorsi-penny-social.it" # Domain from package.json
 
 echo "Setting up AWS Milano Social Contest Storage..."
 
-# 1. Create S3 Bucket in Milan Region
-echo "--- 1. Creating S3 bucket: $BUCKET_NAME in $REGION ---"
-aws s3api create-bucket \
-    --bucket $BUCKET_NAME \
-    --region $REGION \
-    --create-bucket-configuration LocationConstraint=$REGION
+# 1. Create S3 Bucket in Milan Region (if it doesn't exist)
+echo "--- 1. Checking S3 bucket: $BUCKET_NAME ---"
+if aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
+    echo "Bucket $BUCKET_NAME already exists. Skipping creation."
+else
+    echo "Creating S3 bucket: $BUCKET_NAME in $REGION..."
+    aws s3api create-bucket \
+        --bucket $BUCKET_NAME \
+        --region $REGION \
+        --create-bucket-configuration LocationConstraint=$REGION
+fi
 
 # 2. Configure CORS Policy
 # This allows the Vercel frontend to read JSON files via GET requests.
@@ -41,19 +46,19 @@ aws s3api put-bucket-cors \
 
 # 3. Create Folder Structure
 # In S3, folders are just objects with a trailing slash.
-echo "--- 3. Creating folder structure: /eurobet/ and /penny/ ---"
-aws s3 mb s3://$BUCKET_NAME/eurobet/
-aws s3 mb s3://$BUCKET_NAME/penny/
+echo "--- 3. Ensuring folder structure: /eurobet/ and /penny/ ---"
+# Note: put-object just ensures the prefix exists by creating an empty object ending in /
+aws s3api put-object --bucket $BUCKET_NAME --key eurobet/ > /dev/null
+aws s3api put-object --bucket $BUCKET_NAME --key penny/ > /dev/null
 
-# Note: s3 mb is normally for buckets. To create a "folder" we upload an empty object:
-aws s3api put-object --bucket $BUCKET_NAME --key eurobet/
-aws s3api put-object --bucket $BUCKET_NAME --key penny/
+# 4. Disable Public Access Block (to allow the public read-only policy)
+# Since 2023, S3 blocks public access by default. We must disable it to allow public-read policies.
+echo "--- 4. Disabling S3 Block Public Access for $BUCKET_NAME ---"
+aws s3api put-public-access-block \
+    --bucket $BUCKET_NAME \
+    --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
 
-# 4. Disable Public Access Block (to allow specific cross-origin access if needed)
-# Actually, by default S3 buckets are private. We keep them private but allow CORS to work.
-# To ensure files are readable via URL if known (obfuscation), we need to upload them with public-read 
-# or use a Bukcet Policy. The user asked for "obfuscation" (knowing the URL).
-echo "--- 4. Setting Bucket Policy for public read-only (obfuscation) ---"
+echo "--- 5. Setting Bucket Policy for public read-only (obfuscation) ---"
 BUCKET_POLICY='{
     "Version": "2012-10-17",
     "Statement": [

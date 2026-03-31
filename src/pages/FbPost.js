@@ -1,23 +1,42 @@
+import React, { useMemo, useState, useEffect } from "react";
 import "../App.css";
 import { CSVLink } from "react-csv";
-import usersData from "../data/hashtag-facebook.json";
-import { useMemo } from "react";
-import { useTable } from "react-table";
 import Navbar from "../navbar";
-
-// Columns array created for table header
-const columns = [
-  { Header: "ID", accessor: "id" },
-  { Header: "Nome", accessor: "name" },
-  { Header: "URL Profilo", accessor: "profileUrl", Cell: ({value}) => <a href={value} target="_blank" rel="noreferrer" className="text-secondary small">Vedi</a> },
-  { Header: "Hashtag", accessor: "hashtag" },
-  { Header: "Post", accessor: "url", Cell: ({value}) => <a href={value} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-light py-0 px-2" style={{fontSize: '0.7rem'}}>LINK</a> },
-  { Header: "Data", accessor: "date" },
-  { Header: "Testo", accessor: "text", Cell: ({value}) => <div className="text-truncate" style={{maxWidth: '200px'}}>{value}</div> },
-];
+import { useTable } from "react-table";
+import config from "../config";
 
 function App() {
-  const data = useMemo(() => usersData, []);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${config.s3BaseUrl}${config.fbPostPath}`);
+        if (!response.ok) throw new Error('Data not found on S3');
+        const jsonData = await response.json();
+        setData(Array.isArray(jsonData) ? jsonData : []);
+      } catch (e) {
+        console.warn("Using local fallback or empty data:", e);
+        setData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Columns array created for table header
+  const columns = useMemo(() => [
+    { Header: "ID", accessor: "id" },
+    { Header: "Nome", accessor: "name" },
+    { Header: "URL Profilo", accessor: "profileUrl", Cell: ({value}) => <a href={value} target="_blank" rel="noreferrer" className="text-secondary small">Vedi</a> },
+    { Header: "Hashtag", accessor: "hashtag" },
+    { Header: "Post", accessor: "url", Cell: ({value}) => <a href={value} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-light py-0 px-2" style={{fontSize: '0.7rem'}}>LINK</a> },
+    { Header: "Data", accessor: "date" },
+    { Header: "Testo", accessor: "text", Cell: ({value}) => <div className="text-truncate" style={{maxWidth: '200px'}}>{value}</div> },
+  ], []);
+
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data });
 
   const csvData = [
@@ -46,37 +65,41 @@ function App() {
         </div>
 
         <div className="glass-card p-0 mb-5 overflow-hidden">
-          <div className="table-responsive">
-            <table className="table" {...getTableProps()}>
-              <thead>
-                {headerGroups.map((headerGroup) => (
-                  <tr {...headerGroup.getHeaderGroupProps()}>
-                    {headerGroup.headers.map((column) => (
-                      <th {...column.getHeaderProps()}>{column.render("Header")}</th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody {...getTableBodyProps()}>
-                {rows.length > 0 ? rows.map((row) => {
-                  prepareRow(row);
-                  return (
-                    <tr {...row.getRowProps()}>
-                      {row.cells.map((cell) => (
-                        <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+          {loading ? (
+             <div className="text-center py-5 text-secondary italic">Caricamento dati da S3...</div>
+          ) : (
+            <div className="table-responsive">
+              <table className="table" {...getTableProps()}>
+                <thead>
+                  {headerGroups.map((headerGroup) => (
+                    <tr {...headerGroup.getHeaderGroupProps()}>
+                      {headerGroup.headers.map((column) => (
+                        <th {...column.getHeaderProps()}>{column.render("Header")}</th>
                       ))}
                     </tr>
-                  );
-                }) : (
-                    <tr>
-                        <td colSpan={columns.length} className="text-center py-5 text-secondary">
-                            <div className="opacity-50 italic">Nessun dato storico trovato.</div>
-                        </td>
-                    </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                  ))}
+                </thead>
+                <tbody {...getTableBodyProps()}>
+                  {rows.length > 0 ? rows.map((row) => {
+                    prepareRow(row);
+                    return (
+                      <tr {...row.getRowProps()}>
+                        {row.cells.map((cell) => (
+                          <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                        ))}
+                      </tr>
+                    );
+                  }) : (
+                      <tr>
+                          <td colSpan={columns.length} className="text-center py-5 text-secondary">
+                              <div className="opacity-50 italic">Nessun dato storico trovato.</div>
+                          </td>
+                      </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </div>

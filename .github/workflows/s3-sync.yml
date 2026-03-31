@@ -1,0 +1,27 @@
+name: S3 Data Sync
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/data/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: AWS_ACCESS_KEY_ID
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Sync src/data to S3
+      run: |
+        aws s3 sync src/data/ s3://${{ secrets.AWS_S3_BUCKET }}/data/ --delete

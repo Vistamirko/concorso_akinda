@@ -1,10 +1,15 @@
 const config = {
-    // URL ufficiale dello storage AWS Milano (Task A)
-    s3BaseUrl: "https://concorso-akinda-storage-1774886841.s3.eu-south-1.amazonaws.com",
+    // URL ufficiale dello storage AWS Milano
+    s3BaseUrl: process.env.REACT_APP_S3_BASE_URL || "https://penny-eurobet-storage-milan.s3.eu-south-1.amazonaws.com",
     
-    // Percorsi dei file JSON (Task B e C)
-    eurobetDataPath: "/eurobet/data.json",
-    pennyDataPath: "/penny/data.json",
+    // Percorsi dinamici dei file JSON (Sincronizzati da GitHub)
+    eurobetDataPath: "/data/hashtag-instagram.json",
+    pennyDataPath: "/data/hashtag-facebook.json",
+    
+    // Altri percorsi per archivi storici
+    igCommentPath: "/data/igcomment.json",
+    fbPostPath: "/data/hashtag-facebook.json",
+    igPostPath: "/data/hashtag-instagram.json",
     
     // Fallback: se AWS è vuoto, usa i dati locali? (opzionale)
     useLocalFallback: false
