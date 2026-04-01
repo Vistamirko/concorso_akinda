@@ -32,10 +32,31 @@ function EurobetWave1() {
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data });
 
-  const csvData = [
-    ["Utente", "Data", "Commento", "URL"],
-    ...data.map(p => [p.Username, p.Date, p.CommentText, p.ProfileURL])
-  ];
+  const handleExportExcel = () => {
+    // Genera una tabella HTML che Excel può interpretare come foglio di calcolo
+    const tableHeader = "<tr><th>Utente</th><th>Data</th><th>Commento</th><th>URL</th></tr>";
+    const tableRows = data.map(p => `
+      <tr>
+        <td>${p.Username}</td>
+        <td>${p.Date}</td>
+        <td>${(p.CommentText || "").replace(/\n/g, " ")}</td>
+        <td>${p.ProfileURL}</td>
+      </tr>`).join("");
+    
+    const tableHtml = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Eurobet Wave 1</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
+      <body><table>${tableHeader}${tableRows}</table></body>
+      </html>`;
+    
+    const blob = new Blob([tableHtml], { type: "application/vnd.ms-excel" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `eurobet_wave1_report_${new Date().toISOString().split('T')[0]}.xls`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="App">
@@ -50,9 +71,9 @@ function EurobetWave1() {
             <p className="text-secondary lead mt-2">Raccolta commenti (Engagement Post Profilo) &bull; Wave 1</p>
           </div>
           <div className="col-12 col-md-4 text-md-end">
-            <CSVLink className="btn btn-primary" filename="eurobet_wave1_comments.csv" data={csvData}>
-              ESPORTA DATI CSV
-            </CSVLink>
+            <button className="btn btn-primary" onClick={handleExportExcel}>
+              ESPORTA DATI EXCEL
+            </button>
           </div>
         </div>
 

@@ -7,6 +7,7 @@ import config from "../config";
 
 const columns = [
   { Header: "Nome Utente", accessor: "fullName", Cell: ({value}) => <span className="fw-bold">{value}</span> },
+  { Header: "Data Pubblicazione", accessor: "timestamp", Cell: ({value}) => <span className="opacity-50 small">{value || "N/D"}</span> },
   { Header: "Contenuto Post", accessor: "caption", Cell: ({value}) => <div className="text-truncate" style={{maxWidth: '400px'}}>{value}</div> },
   { Header: "Link Post", accessor: "url", Cell: ({value}) => <a href={value} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-light border-opacity-10 py-1 px-3" style={{fontSize: '0.7rem'}}>VEDI SU IG</a> },
 ];
@@ -31,10 +32,32 @@ function EurobetDashboard() {
   const tableData = useMemo(() => data, [data]);
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data: tableData });
 
-  const csvData = [
-    ["ID", "Didascalia", "Utente", "URL"],
-    ...data.map(p => [p.id, p.caption, p.fullName, p.url])
-  ];
+  const handleExportExcel = () => {
+    // Genera una tabella HTML che Excel può interpretare come foglio di calcolo
+    const tableHeader = "<tr><th>ID</th><th>Utente</th><th>Data Pubblicazione</th><th>Didascalia</th><th>URL</th></tr>";
+    const tableRows = data.map(p => `
+      <tr>
+        <td>${p.id}</td>
+        <td>${p.fullName}</td>
+        <td>${p.timestamp || "N/D"}</td>
+        <td>${(p.caption || "").replace(/\n/g, " ")}</td>
+        <td>${p.url}</td>
+      </tr>`).join("");
+    
+    const tableHtml = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Eurobet Hashtags</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
+      <body><table>${tableHeader}${tableRows}</table></body>
+      </html>`;
+    
+    const blob = new Blob([tableHtml], { type: "application/vnd.ms-excel" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `eurobet_report_${new Date().toISOString().split('T')[0]}.xls`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="App">
@@ -49,9 +72,9 @@ function EurobetDashboard() {
             <p className="text-secondary lead mt-2">Monitoraggio avanzato hashtag &bull; Wave 2, 3, 4</p>
           </div>
           <div className="col-12 col-md-4 text-md-end">
-            <CSVLink className="btn btn-primary" filename="eurobet_hashtags.csv" data={csvData}>
-              SCARICA REPORT CSV
-            </CSVLink>
+            <button className="btn btn-primary" onClick={handleExportExcel}>
+              SCARICA REPORT EXCEL
+            </button>
           </div>
         </div>
 
