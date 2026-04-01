@@ -1,6 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
 import "../App.css";
-import { CSVLink } from "react-csv";
 import Navbar from "../navbar";
 import { useTable } from "react-table";
 import config from "../config";
@@ -38,13 +37,31 @@ function App() {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
-  // Contains the column headers and table data in the required format for CSV
-  const csvData = [
-    ["id", "caption", "fullName", "url"],
-    ...data.map(({ id, caption, fullName, url }) => [
-      id, caption, fullName, url
-    ]),
-  ];
+  const handleExportExcel = () => {
+    // Genera una tabella HTML che Excel può interpretare come foglio di calcolo
+    const tableHeader = "<tr><th>ID</th><th>Didascalia</th><th>Nome Completo</th><th>URL</th></tr>";
+    const tableRows = data.map(p => `
+      <tr>
+        <td>${p.id}</td>
+        <td>${(p.caption || "").replace(/\n/g, " ")}</td>
+        <td>${p.fullName}</td>
+        <td>${p.url}</td>
+      </tr>`).join("");
+    
+    const tableHtml = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Instagram Posts</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
+      <body><table>${tableHeader}${tableRows}</table></body>
+      </html>`;
+    
+    const blob = new Blob([tableHtml], { type: "application/vnd.ms-excel" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `archive_ig_posts_${new Date().toISOString().split('T')[0]}.xls`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="App">
@@ -58,9 +75,9 @@ function App() {
             <p className="text-secondary lead mt-2">Archivio storico partecipazioni Instagram Hashtag &bull; Penny Archives</p>
           </div>
           <div className="col-12 col-md-4 text-md-end">
-            <CSVLink className="btn btn-primary" filename="hashtag-instagram.csv" data={csvData}>
-              SCARICA CSV
-            </CSVLink>
+            <button className="btn btn-primary" onClick={handleExportExcel}>
+              SCARICA EXCEL
+            </button>
           </div>
         </div>
 

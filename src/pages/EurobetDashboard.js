@@ -2,7 +2,6 @@ import React, { useMemo, useState, useEffect } from "react";
 import "../App.css";
 import Navbar from "../navbar";
 import { useTable } from "react-table";
-import { CSVLink } from "react-csv";
 import config from "../config";
 
 const columns = [
