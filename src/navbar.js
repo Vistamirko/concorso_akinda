@@ -35,7 +35,8 @@ function BasicExample() {
             
             <NavDropdown title="Eurobet" id="eurobet-nav-dropdown" className="mx-lg-2">
               <div className="dropdown-label-custom small opacity-50 px-3 py-1">CONCORSI</div>
-              <NavDropdown.Item href="/eurobet-instagram">Instagram Hashtag</NavDropdown.Item>
+              <NavDropdown.Item href="/eurobet-wave1">Instagram Commenti (W1)</NavDropdown.Item>
+              <NavDropdown.Item href="/eurobet-instagram">Instagram Hashtag (W2-4)</NavDropdown.Item>
             </NavDropdown>
 
             <NavDropdown title="Penny" id="penny-nav-dropdown" className="mx-lg-2">

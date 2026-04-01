@@ -5,6 +5,7 @@ import FbPost from "./pages/FbPost";
 import IgPost from "./pages/IgPost";
 import IgComment from "./pages/IgComment";
 import EurobetDashboard from "./pages/EurobetDashboard";
+import EurobetWave1 from "./pages/EurobetWave1";
 import PennyDashboard from "./pages/PennyDashboard";
 import Login from "./login";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -18,6 +19,7 @@ export default function App() {
           
           <Route index element={<ProtectedRoute><Home /></ProtectedRoute>} />
           <Route path="/Home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/eurobet-wave1" element={<ProtectedRoute><EurobetWave1 /></ProtectedRoute>} />
           <Route path="/eurobet-instagram" element={<ProtectedRoute><EurobetDashboard /></ProtectedRoute>} />
           <Route path="/penny-facebook" element={<ProtectedRoute><PennyDashboard platform="facebook" /></ProtectedRoute>} />
           <Route path="/penny-instagram" element={<ProtectedRoute><PennyDashboard platform="instagram" /></ProtectedRoute>} />

@@ -1,0 +1,29 @@
+[
+  {
+    "UserId": "12345",
+    "Username": "mario_rossi",
+    "CommentId": "c1",
+    "CommentText": "Forza Eurobet! Partecipazione Wave 1",
+    "ProfileURL": "https://www.instagram.com/mario_rossi/",
+    "ProfilePicURL": "",
+    "Date": "01/04/2026, 10:00:00"
+  },
+  {
+    "UserId": "67890",
+    "Username": "luigi_verdi",
+    "CommentId": "c2",
+    "CommentText": "Partecipo al concorso @eurobet",
+    "ProfileURL": "https://www.instagram.com/luigi_verdi/",
+    "ProfilePicURL": "",
+    "Date": "01/04/2026, 10:15:00"
+  },
+  {
+    "UserId": "11223",
+    "Username": "anna_bianchi",
+    "CommentId": "c3",
+    "CommentText": "Bellissimo premio! #Eurobet",
+    "ProfileURL": "https://www.instagram.com/anna_bianchi/",
+    "ProfilePicURL": "",
+    "Date": "01/04/2026, 10:30:00"
+  }
+]
