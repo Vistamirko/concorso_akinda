@@ -40,11 +40,20 @@ function EurobetWave1() {
   ], []);
 
   const filteredData = useMemo(() => {
-    if (!searchTerm) return data;
-    return data.filter(item => 
-      (item.Username || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.CommentText || "").toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    return data.filter(item => {
+      const desc = (item.CommentText || "").toLowerCase();
+      const hasHashtags = desc.includes("#sentilapassionedalvivo") && 
+                          desc.includes("#accettoregolamento") && 
+                          desc.includes("#accettoprivacypolicy");
+      
+      if (!searchTerm) return hasHashtags;
+      
+      const search = searchTerm.toLowerCase();
+      return hasHashtags && (
+        (item.Username || "").toLowerCase().includes(search) ||
+        (item.CommentText || "").toLowerCase().includes(search)
+      );
+    });
   }, [data, searchTerm]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ 
@@ -114,7 +123,7 @@ function EurobetWave1() {
                         <input 
                             type="text" 
                             className="form-control bg-transparent border-0 text-white shadow-none search-input" 
-                            placeholder="Cerca per nome utente o contenuto del commento..." 
+                            placeholder="Cerca per nome utente o commento (filtrato per hashtag validi)..." 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -127,8 +136,8 @@ function EurobetWave1() {
         <div className="row mb-5 g-4">
             <div className="col-md-3">
                 <div className="glass-card text-center py-4">
-                    <div className="text-secondary small fw-bold tracking-widest text-uppercase mb-2">Commenti Totali</div>
-                    <div className="h1-premium mb-0" style={{ fontSize: '2.5rem' }}>{data.length}</div>
+                    <div className="text-secondary small fw-bold tracking-widest text-uppercase mb-2">Commenti Validi</div>
+                    <div className="h1-premium mb-0" style={{ fontSize: '2.5rem' }}>{filteredData.length}</div>
                 </div>
             </div>
             <div className="col-md-3">
