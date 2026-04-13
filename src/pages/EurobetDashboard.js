@@ -13,12 +13,13 @@ const columns = [
 
 function EurobetDashboard() {
   const [data, setData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`${config.s3BaseUrl}${config.eurobetDataPath}`);
         if (!response.ok) throw new Error('Data not found on S3');
-        const jsonData = await response.data || await response.json();
+        const jsonData = await response.json();
         setData(Array.isArray(jsonData) ? jsonData : []);
       } catch (e) {
         console.warn("Using local fallback or empty data:", e);
@@ -28,13 +29,32 @@ function EurobetDashboard() {
     fetchData();
   }, []);
 
-  const tableData = useMemo(() => data, [data]);
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data: tableData });
+  const filteredData = useMemo(() => {
+    return data.filter(item => {
+      const desc = (item.caption || "").toLowerCase();
+      const hasHashtags = desc.includes("#sentilapassionedalvivo") && 
+                          desc.includes("#accettoregolamento") && 
+                          desc.includes("#accettoprivacypolicy");
+      
+      if (!searchTerm) return hasHashtags;
+      
+      const search = searchTerm.toLowerCase();
+      return hasHashtags && (
+        (item.fullName || "").toLowerCase().includes(search) ||
+        (item.caption || "").toLowerCase().includes(search)
+      );
+    });
+  }, [data, searchTerm]);
+
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ 
+    columns, 
+    data: filteredData 
+  });
 
   const handleExportExcel = () => {
     // Genera una tabella HTML che Excel può interpretare come foglio di calcolo
     const tableHeader = "<tr><th>ID</th><th>Utente</th><th>Data Pubblicazione</th><th>Didascalia</th><th>URL</th></tr>";
-    const tableRows = data.map(p => `
+    const tableRows = filteredData.map(p => `
       <tr>
         <td>${p.id}</td>
         <td>${p.fullName}</td>
@@ -77,34 +97,46 @@ function EurobetDashboard() {
           </div>
         </div>
 
+        <div className="row mb-4">
+            <div className="col-12">
+                <div className="glass-card p-3">
+                    <div className="d-flex align-items-center gap-3">
+                        <i className="bi bi-search text-secondary"></i>
+                        <input 
+                            type="text" 
+                            className="form-control bg-transparent border-0 text-white shadow-none search-input" 
+                            placeholder="Cerca per nome utente o didascalia (filtrato per validità)..." 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div className="row mb-5 g-4">
             <div className="col-md-3">
                 <div className="glass-card text-center py-4">
-                    <div className="text-secondary small fw-bold tracking-widest text-uppercase mb-2">Partecipanti Totali</div>
-                    <div className="h1-premium mb-0" style={{ fontSize: '2.5rem' }}>{data.length}</div>
+                    <div className="text-secondary small fw-bold tracking-widest text-uppercase mb-2">Partecipanti Validi</div>
+                    <div className="h1-premium mb-0" style={{ fontSize: '2.5rem' }}>{filteredData.length}</div>
                 </div>
             </div>
             <div className="col-md-3">
                 <div className="glass-card text-center py-4">
-                    <div className="text-secondary small fw-bold tracking-widest text-uppercase mb-2">Prossima Estrazione</div>
-                    <div className="h2 mb-0">15 APR</div>
-                    <div className="small text-secondary mt-1">4 estrazioni totali</div>
+                    <div className="text-secondary small fw-bold tracking-widest text-uppercase mb-2">Post Unici</div>
+                    <div className="h1-premium mb-0" style={{ fontSize: '2.5rem' }}>{new Set(filteredData.map(i => i.url)).size}</div>
                 </div>
             </div>
             <div className="col-md-3">
                 <div className="glass-card text-center py-4">
-                    <div className="text-secondary small fw-bold tracking-widest text-uppercase mb-2">Hashtag Attivo</div>
-                    <div className="h4 mb-0">#sentilapassionedalvivo</div>
-                    <div className="small text-secondary mt-1">Monitoraggio IG</div>
+                    <div className="text-secondary small fw-bold tracking-widest text-uppercase mb-2">Utenti Unici</div>
+                    <div className="h1-premium mb-0" style={{ fontSize: '2.5rem' }}>{new Set(filteredData.map(i => i.fullName)).size}</div>
                 </div>
             </div>
             <div className="col-md-3">
-                <div className="glass-card text-center py-4">
-                    <div className="text-secondary small fw-bold tracking-widest text-uppercase mb-2">Stato Sistema</div>
-                    <div className="d-flex align-items-center justify-content-center gap-2 mt-1">
-                        <div className="bg-success rounded-circle" style={{ width: '10px', height: '10px' }}></div>
-                        <span className="text-success small fw-bold">OPERATIVO</span>
-                    </div>
+                <div className="glass-card text-center py-4 border-azure">
+                    <div className="text-azure small fw-bold tracking-widest text-uppercase mb-2">Hashtag Monitorato</div>
+                    <div className="h6 mb-0 text-white">#sentilapassionedalvivo</div>
                 </div>
             </div>
         </div>
