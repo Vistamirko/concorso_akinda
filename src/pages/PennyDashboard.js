@@ -6,6 +6,8 @@ import config from "../config";
 
 function PennyDashboard({ platform }) {
   const [data, setData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,7 +45,19 @@ function PennyDashboard({ platform }) {
     }
   }, [platform]);
 
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data });
+  const filteredData = useMemo(() => {
+    if (!searchTerm) return data;
+    return data.filter(item => 
+      (item.Username || item.Name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.CommentText || item.Comment || "").toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [data, searchTerm, platform]);
+
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ 
+    columns, 
+    data: filteredData 
+  });
+
 
   const handleExportExcel = () => {
     // Genera una tabella HTML che Excel può interpretare come foglio di calcolo
@@ -92,6 +106,24 @@ function PennyDashboard({ platform }) {
             </button>
           </div>
         </div>
+
+        <div className="row mb-4">
+            <div className="col-12">
+                <div className="glass-card p-3">
+                    <div className="d-flex align-items-center gap-3">
+                        <i className="bi bi-search text-secondary"></i>
+                        <input 
+                            type="text" 
+                            className="form-control bg-transparent border-0 text-white shadow-none search-input" 
+                            placeholder={`Cerca tra i commenti ${platform === 'facebook' ? 'Facebook' : 'Instagram'}...`}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <div className="row mb-5 g-4">
             <div className="col-md-3">

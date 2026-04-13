@@ -6,6 +6,7 @@ import config from "../config";
 
 function EurobetWave1() {
   const [data, setData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -15,8 +16,16 @@ function EurobetWave1() {
         const jsonData = await response.json();
         setData(Array.isArray(jsonData) ? jsonData : []);
       } catch (e) {
-        console.warn("Using local fallback or empty data:", e);
-        setData([]);
+        console.warn("S3 fetch failed, trying local fallback:", e);
+        try {
+          const localResponse = await fetch(config.eurobetWave1Path);
+          if (!localResponse.ok) throw new Error('Local data not found');
+          const localJson = await localResponse.json();
+          setData(Array.isArray(localJson) ? localJson : []);
+        } catch (localError) {
+          console.error("Local fallback also failed:", localError);
+          setData([]);
+        }
       }
     };
     fetchData();
@@ -29,7 +38,18 @@ function EurobetWave1() {
     { Header: "Link Profilo", accessor: "ProfileURL", Cell: ({value}) => <a href={value} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-light border-opacity-10 py-1 px-3" style={{fontSize: '0.7rem'}}>PROFILO</a> },
   ], []);
 
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ columns, data });
+  const filteredData = useMemo(() => {
+    if (!searchTerm) return data;
+    return data.filter(item => 
+      (item.Username || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.CommentText || "").toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [data, searchTerm]);
+
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ 
+    columns, 
+    data: filteredData 
+  });
 
   const handleExportExcel = () => {
     // Genera una tabella HTML che Excel può interpretare come foglio di calcolo
@@ -76,6 +96,24 @@ function EurobetWave1() {
           </div>
         </div>
 
+        <div className="row mb-4">
+            <div className="col-12">
+                <div className="glass-card p-3">
+                    <div className="d-flex align-items-center gap-3">
+                        <i className="bi bi-search text-secondary"></i>
+                        <input 
+                            type="text" 
+                            className="form-control bg-transparent border-0 text-white shadow-none search-input" 
+                            placeholder="Cerca per nome utente o contenuto del commento..." 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
         <div className="row mb-5 g-4">
             <div className="col-md-3">
                 <div className="glass-card text-center py-4">
@@ -104,6 +142,7 @@ function EurobetWave1() {
                         <div className="bg-success rounded-circle" style={{ width: '10px', height: '10px' }}></div>
                         <span className="text-success small fw-bold">OPERATIVO</span>
                     </div>
+                    <div className="small text-secondary opacity-50 mt-1" style={{ fontSize: '0.65rem' }}>Ultimo scraping: 13 Aprile 2026</div>
                 </div>
             </div>
         </div>

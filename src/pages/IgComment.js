@@ -7,6 +7,8 @@ import config from "../config";
 function App() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,9 +35,18 @@ function App() {
     { Header: "Data", accessor: "Date", Cell: ({value}) => <span className="opacity-50 small">{value}</span> },
   ], []);
 
+  const filteredData = useMemo(() => {
+    if (!searchTerm) return data;
+    return data.filter(item => 
+      (item.Username || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.CommentText || "").toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [data, searchTerm]);
+
   // Calling react table hook
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({ columns, data });
+    useTable({ columns, data: filteredData });
+
 
   const handleExportExcel = () => {
     // Genera una tabella HTML che Excel può interpretare come foglio di calcolo
@@ -80,6 +91,24 @@ function App() {
             </button>
           </div>
         </div>
+
+        <div className="row mb-4">
+            <div className="col-12">
+                <div className="glass-card p-3">
+                    <div className="d-flex align-items-center gap-3">
+                        <i className="bi bi-search text-secondary"></i>
+                        <input 
+                            type="text" 
+                            className="form-control bg-transparent border-0 text-white shadow-none search-input" 
+                            placeholder="Cerca per username o testo del commento..." 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <div className="glass-card p-0 mb-5 overflow-hidden">
           {loading ? (
