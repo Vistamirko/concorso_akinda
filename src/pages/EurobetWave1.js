@@ -4,6 +4,7 @@ import Navbar from "../navbar";
 import { useTable } from "react-table";
 import config from "../config";
 
+
 function EurobetWave1() {
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -52,27 +53,38 @@ function EurobetWave1() {
   });
 
   const handleExportExcel = () => {
-    // Genera un file CSV con BOM UTF-8 per la massima compatibilità con Excel
-    const csvHeader = ["Utente", "Data", "Commento", "URL"];
-    const csvRows = filteredData.map(p => [
+    // Genera un file Excel compatibile usando il formato Tab-Separated Values (UTF-16LE)
+    // Questo è il modo più affidabile per far sì che Excel lo apra correttamente come spreadsheet
+    const headers = ["Utente", "Data", "Commento", "URL"];
+    const rows = filteredData.map(p => [
       p.Username || "",
       p.Date || "",
       (p.CommentText || "").replace(/\n/g, " "),
       p.ProfileURL || ""
     ]);
-    
-    const csvContent = [csvHeader, ...csvRows]
-      .map(e => e.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","))
+
+    const content = [headers, ...rows]
+      .map(row => row.join("\t"))
       .join("\n");
-    
-    const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+
+    // Codifica in UTF-16LE con BOM per far capire a Excel che è un file di dati
+    const buffer = new ArrayBuffer(content.length * 2 + 2);
+    const view = new DataView(buffer);
+    view.setUint16(0, 0xFEFF, true); // BOM
+    for (let i = 0; i < content.length; i++) {
+      view.setUint16((i + 1) * 2, content.charCodeAt(i), true);
+    }
+
+    const blob = new Blob([buffer], { type: "application/vnd.ms-excel" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `eurobet_wave1_report_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `eurobet_wave1_report_${new Date().toISOString().split('T')[0]}.xls`;
     a.click();
     URL.revokeObjectURL(url);
   };
+
+
 
 
   return (
