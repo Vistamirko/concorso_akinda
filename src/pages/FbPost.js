@@ -53,33 +53,31 @@ function App() {
 
 
   const handleExportExcel = () => {
-    // Genera una tabella HTML che Excel può interpretare come foglio di calcolo
-    const tableHeader = "<tr><th>ID</th><th>Nome</th><th>URL Profilo</th><th>Hashtag</th><th>URL Post</th><th>Data</th><th>Testo</th></tr>";
-    const tableRows = data.map(p => `
-      <tr>
-        <td>${p.id}</td>
-        <td>${p.name}</td>
-        <td>${p.profileUrl}</td>
-        <td>${p.hashtag}</td>
-        <td>${p.url}</td>
-        <td>${p.date}</td>
-        <td>${(p.text || "").replace(/\n/g, " ")}</td>
-      </tr>`).join("");
+    // Genera un file CSV con BOM UTF-8 per la massima compatibilità
+    const csvHeader = ["ID", "Nome", "URL Profilo", "Hashtag", "URL Post", "Data", "Testo"];
+    const csvRows = filteredData.map(p => [
+      p.id || "",
+      p.name || "",
+      p.profileUrl || "",
+      p.hashtag || "",
+      p.url || "",
+      p.date || "",
+      (p.text || "").replace(/\n/g, " ")
+    ]);
     
-    const tableHtml = `
-      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-      <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Facebook Posts</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
-      <body><table>${tableHeader}${tableRows}</table></body>
-      </html>`;
+    const csvContent = [csvHeader, ...csvRows]
+      .map(e => e.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
     
-    const blob = new Blob([tableHtml], { type: "application/vnd.ms-excel" });
+    const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `archive_fb_posts_${new Date().toISOString().split('T')[0]}.xls`;
+    a.download = `archive_fb_posts_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
+
 
   return (
     <div className="App">

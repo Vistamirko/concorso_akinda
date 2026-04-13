@@ -60,33 +60,36 @@ function PennyDashboard({ platform }) {
 
 
   const handleExportExcel = () => {
-    // Genera una tabella HTML che Excel può interpretare come foglio di calcolo
-    const headers = platform === 'facebook' 
-      ? "<tr><th>Utente</th><th>Data</th><th>Commento</th></tr>"
-      : "<tr><th>Utente</th><th>Data</th><th>Commento</th><th>URL</th></tr>";
+    // Genera un file CSV con BOM UTF-8 per la massima compatibilità
+    const csvHeader = platform === 'facebook' 
+      ? ["Utente", "Data", "Commento"]
+      : ["Utente", "Data", "Commento", "URL"];
       
-    const tableRows = data.map(p => `
-      <tr>
-        <td>${p.Username || p.Name}</td>
-        <td>${p.Date || p.Data}</td>
-        <td>${((p.CommentText || p.Comment) || "").replace(/\n/g, " ")}</td>
-        ${platform === 'instagram' ? `<td>${p.ProfileURL || p.Id}</td>` : ""}
-      </tr>`).join("");
+    const csvRows = filteredData.map(p => {
+      const row = [
+        p.Username || p.Name || "",
+        p.Date || p.Data || "",
+        ((p.CommentText || p.Comment) || "").replace(/\n/g, " ")
+      ];
+      if (platform === 'instagram') {
+        row.push(p.ProfileURL || p.Id || "");
+      }
+      return row;
+    });
     
-    const tableHtml = `
-      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-      <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Penny ${platform}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
-      <body><table>${headers}${tableRows}</table></body>
-      </html>`;
+    const csvContent = [csvHeader, ...csvRows]
+      .map(e => e.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
     
-    const blob = new Blob([tableHtml], { type: "application/vnd.ms-excel" });
+    const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `penny_${platform}_report_${new Date().toISOString().split('T')[0]}.xls`;
+    a.download = `penny_${platform}_report_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
+
 
   return (
     <div className="App">

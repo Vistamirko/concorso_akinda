@@ -52,30 +52,28 @@ function EurobetWave1() {
   });
 
   const handleExportExcel = () => {
-    // Genera una tabella HTML che Excel può interpretare come foglio di calcolo
-    const tableHeader = "<tr><th>Utente</th><th>Data</th><th>Commento</th><th>URL</th></tr>";
-    const tableRows = data.map(p => `
-      <tr>
-        <td>${p.Username}</td>
-        <td>${p.Date}</td>
-        <td>${(p.CommentText || "").replace(/\n/g, " ")}</td>
-        <td>${p.ProfileURL}</td>
-      </tr>`).join("");
+    // Genera un file CSV con BOM UTF-8 per la massima compatibilità con Excel
+    const csvHeader = ["Utente", "Data", "Commento", "URL"];
+    const csvRows = filteredData.map(p => [
+      p.Username || "",
+      p.Date || "",
+      (p.CommentText || "").replace(/\n/g, " "),
+      p.ProfileURL || ""
+    ]);
     
-    const tableHtml = `
-      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-      <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Eurobet Wave 1</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
-      <body><table>${tableHeader}${tableRows}</table></body>
-      </html>`;
+    const csvContent = [csvHeader, ...csvRows]
+      .map(e => e.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
     
-    const blob = new Blob([tableHtml], { type: "application/vnd.ms-excel" });
+    const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `eurobet_wave1_report_${new Date().toISOString().split('T')[0]}.xls`;
+    a.download = `eurobet_wave1_report_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
+
 
   return (
     <div className="App">
