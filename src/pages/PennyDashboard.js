@@ -51,7 +51,7 @@ function PennyDashboard({ platform }) {
       (item.Username || item.Name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       (item.CommentText || item.Comment || "").toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [data, searchTerm, platform]);
+  }, [data, searchTerm]);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({ 
     columns, 
