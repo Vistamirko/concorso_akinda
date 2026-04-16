@@ -12,21 +12,33 @@ function EurobetWave1() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${config.s3BaseUrl}${config.eurobetWave1Path}`);
-        if (!response.ok) throw new Error('Data not found on S3');
-        const jsonData = await response.json();
-        setData(Array.isArray(jsonData) ? jsonData : []);
-      } catch (e) {
-        console.warn("S3 fetch failed, trying local fallback:", e);
-        try {
-          const localResponse = await fetch(config.eurobetWave1Path);
-          if (!localResponse.ok) throw new Error('Local data not found');
-          const localJson = await localResponse.json();
-          setData(Array.isArray(localJson) ? localJson : []);
-        } catch (localError) {
-          console.error("Local fallback also failed:", localError);
-          setData([]);
+        // Try local data first for development
+        let response = await fetch(config.eurobetWave1Path);
+        
+        if (!response.ok) {
+           console.log("Local Wave 1 data not found, trying S3...");
+           response = await fetch(`${config.s3BaseUrl}${config.eurobetWave1Path}`);
         }
+
+        if (!response.ok) throw new Error('Data not found');
+        
+        const jsonData = await response.json();
+        const finalData = Array.isArray(jsonData) ? jsonData : [];
+        
+        // If local is empty, try S3 as ultimate fallback
+        if (finalData.length === 0 && response.url.includes('localhost') === false) {
+             const s3Response = await fetch(`${config.s3BaseUrl}${config.eurobetWave1Path}`);
+             if (s3Response.ok) {
+                 const s3Data = await s3Response.json();
+                 setData(Array.isArray(s3Data) ? s3Data : []);
+                 return;
+             }
+        }
+
+        setData(finalData);
+      } catch (e) {
+        console.warn("Unable to load Eurobet Wave 1 data:", e);
+        setData([]);
       }
     };
     fetchData();

@@ -17,19 +17,30 @@ function EurobetDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Try S3 first
-        let response = await fetch(`${config.s3BaseUrl}${config.eurobetWave2Path}`);
+        // Try local data first for immediate updates
+        let response = await fetch(config.eurobetWave2Path);
         
-        // If S3 fails or file is missing, try local fallback from /public/data/
         if (!response.ok) {
-          console.log("Wave 2 data not found on S3, trying local fallback...");
-          response = await fetch(config.eurobetWave2Path);
+           console.log("Local Wave 2 data not found, trying S3...");
+           response = await fetch(`${config.s3BaseUrl}${config.eurobetWave2Path}`);
         }
 
         if (!response.ok) throw new Error('Data not found');
         
         const jsonData = await response.json();
-        setData(Array.isArray(jsonData) ? jsonData : []);
+        const finalData = Array.isArray(jsonData) ? jsonData : [];
+        
+        // If local/S3 is empty, try the other as fallback
+        if (finalData.length === 0) {
+             const fallbackResponse = await fetch(`${config.s3BaseUrl}${config.eurobetWave2Path}`);
+             if (fallbackResponse.ok) {
+                 const fallbackData = await fallbackResponse.json();
+                 setData(Array.isArray(fallbackData) ? fallbackData : []);
+                 return;
+             }
+        }
+
+        setData(finalData);
       } catch (e) {
         console.warn("Unable to load Eurobet Wave 2 data:", e);
         setData([]);
