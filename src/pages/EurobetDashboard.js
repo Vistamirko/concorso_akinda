@@ -73,28 +73,34 @@ function EurobetDashboard() {
   });
 
   const handleExportExcel = () => {
-    // Genera una tabella HTML che Excel può interpretare come foglio di calcolo
-    const tableHeader = "<tr><th>ID</th><th>Utente</th><th>Data Pubblicazione</th><th>Didascalia</th><th>URL</th></tr>";
-    const tableRows = filteredData.map(p => `
-      <tr>
-        <td>${p.id}</td>
-        <td>${p.fullName}</td>
-        <td>${p.timestamp || "N/D"}</td>
-        <td>${(p.caption || "").replace(/\n/g, " ")}</td>
-        <td>${p.url}</td>
-      </tr>`).join("");
-    
-    const tableHtml = `
-      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-      <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Eurobet Hashtags</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
-      <body><table>${tableHeader}${tableRows}</table></body>
-      </html>`;
-    
-    const blob = new Blob([tableHtml], { type: "application/vnd.ms-excel" });
+    // Genera un file Excel compatibile usando il formato Tab-Separated Values (UTF-16LE)
+    // Questo è il modo più affidabile per far sì che Excel lo apra correttamente come spreadsheet
+    const headers = ["ID", "Utente", "Data Pubblicazione", "Didascalia", "URL"];
+    const rows = filteredData.map(p => [
+      p.id || "",
+      p.fullName || p.username || "",
+      p.timestamp || "",
+      (p.caption || "").replace(/\n/g, " "),
+      p.url || ""
+    ]);
+
+    const content = [headers, ...rows]
+      .map(row => row.join("\t"))
+      .join("\n");
+
+    // Codifica in UTF-16LE con BOM per far capire a Excel che è un file di dati
+    const buffer = new ArrayBuffer(content.length * 2 + 2);
+    const view = new DataView(buffer);
+    view.setUint16(0, 0xFEFF, true); // BOM
+    for (let i = 0; i < content.length; i++) {
+      view.setUint16((i + 1) * 2, content.charCodeAt(i), true);
+    }
+
+    const blob = new Blob([buffer], { type: "application/vnd.ms-excel" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `eurobet_report_${new Date().toISOString().split('T')[0]}.xls`;
+    a.download = `eurobet_wave2_report_${new Date().toISOString().split('T')[0]}.xls`;
     a.click();
     URL.revokeObjectURL(url);
   };
