@@ -126,6 +126,16 @@ function PennyDashboard({ platform }) {
             <p className="text-secondary lead mt-2">
               {platform === 'wave1' ? 'Il Prodotto Misterioso - Analisi Commenti' : 'Raccolta commenti e gestione estrazioni • Aprile - Giugno'}
             </p>
+            {platform === 'instagram' && (
+              <p className="small text-secondary">
+                Export dei commenti al post: <a href="https://www.instagram.com/p/DXotHFAjcSM" target="_blank" rel="noreferrer" className="text-primary">https://www.instagram.com/p/DXotHFAjcSM</a>
+              </p>
+            )}
+            {platform === 'facebook' && (
+              <p className="small text-secondary">
+                Export dei commenti al post: <a href="https://www.facebook.com/reel/26150331361316568" target="_blank" rel="noreferrer" className="text-primary">https://www.facebook.com/reel/26150331361316568</a>
+              </p>
+            )}
           </div>
           <div className="col-12 col-md-4 text-md-end">
             <button className="btn btn-primary" onClick={handleExportExcel}>
