@@ -17,32 +17,30 @@ function EurobetDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Try local data first for immediate updates
-        let response = await fetch(config.eurobetWave2Path);
-        
-        if (!response.ok) {
-           console.log("Local Wave 2 data not found, trying S3...");
-           response = await fetch(`${config.s3BaseUrl}${config.eurobetWave2Path}`);
+        const paths = [config.eurobetWave2Path, config.eurobetWave3Path];
+        let allData = [];
+
+        for (const path of paths) {
+          try {
+            let response = await fetch(path);
+            if (!response.ok) {
+              response = await fetch(`${config.s3BaseUrl}${path}`);
+            }
+            
+            if (response.ok) {
+              const jsonData = await response.json();
+              if (Array.isArray(jsonData)) {
+                allData = [...allData, ...jsonData];
+              }
+            }
+          } catch (err) {
+            console.warn(`Errore nel caricamento di ${path}:`, err);
+          }
         }
 
-        if (!response.ok) throw new Error('Data not found');
-        
-        const jsonData = await response.json();
-        const finalData = Array.isArray(jsonData) ? jsonData : [];
-        
-        // If local/S3 is empty, try the other as fallback
-        if (finalData.length === 0) {
-             const fallbackResponse = await fetch(`${config.s3BaseUrl}${config.eurobetWave2Path}`);
-             if (fallbackResponse.ok) {
-                 const fallbackData = await fallbackResponse.json();
-                 setData(Array.isArray(fallbackData) ? fallbackData : []);
-                 return;
-             }
-        }
-
-        setData(finalData);
+        setData(allData);
       } catch (e) {
-        console.warn("Unable to load Eurobet Wave 2 data:", e);
+        console.warn("Unable to load Eurobet data:", e);
         setData([]);
       }
     };
@@ -100,7 +98,7 @@ function EurobetDashboard() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `eurobet_wave2_report_${new Date().toISOString().split('T')[0]}.xls`;
+    a.download = `eurobet_report_${new Date().toISOString().split('T')[0]}.xls`;
     a.click();
     URL.revokeObjectURL(url);
   };

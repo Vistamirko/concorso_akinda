@@ -6,8 +6,10 @@ const config = {
     eurobetDataPath: "/data/hashtag-instagram.json",
     eurobetWave1Path: "/data/eurobet-wave1.json",
     eurobetWave2Path: "/data/eurobet_wave2.json",
+    eurobetWave3Path: "/data/eurobet_wave3.json",
 
     pennyDataPath: "/data/fbcomment.json",
+    pennyWave1Path: "/data/penny_wave1.json",
     
     // Altri percorsi per archivi storici
     igCommentPath: "/data/igcomment.json",

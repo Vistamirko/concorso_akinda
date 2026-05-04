@@ -14,12 +14,18 @@ function PennyDashboard({ platform }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const dataPath = platform === "instagram" ? config.igCommentPath : config.pennyDataPath;
-        const response = await fetch(`${config.s3BaseUrl}${dataPath}`);
-        if (!response.ok) throw new Error('Data not found on S3');
+        let dataPath = config.pennyDataPath;
+        if (platform === "instagram") dataPath = config.igCommentPath;
+        if (platform === "wave1") dataPath = config.pennyWave1Path;
+
+        let response = await fetch(dataPath);
+        if (!response.ok) {
+          response = await fetch(`${config.s3BaseUrl}${dataPath}`);
+        }
+        
+        if (!response.ok) throw new Error('Data not found');
         const jsonData = await response.json();
         
-        // Handle platform specific filtering if the JSON is unified
         setData(Array.isArray(jsonData) ? jsonData : []);
       } catch (e) {
         console.warn("Using local fallback or empty data:", (e instanceof Error) ? e.message : e);
@@ -38,6 +44,7 @@ function PennyDashboard({ platform }) {
         { Header: "Testo Commento", accessor: "Comment", Cell: ({value}) => <div className="text-white text-opacity-75">{value}</div> },
       ];
     } else {
+      // Per instagram e wave1 usiamo lo stesso schema
       return [
         { Header: "Nome Utente", accessor: "Username", Cell: ({value}) => <span className="fw-bold">{value}</span> },
         { Header: "Data e Ora", accessor: "Date", Cell: ({value}) => <span className="opacity-50 small">{value}</span> },
@@ -112,9 +119,13 @@ function PennyDashboard({ platform }) {
 
         <div className="row align-items-end mb-5 pt-4">
           <div className="col-12 col-md-8">
-            <div className="badge-premium mb-3" style={{ background: 'rgba(0, 112, 243, 0.1)', color: '#0070f3' }}>Engagement {platform.toUpperCase()}</div>
+            <div className="badge-premium mb-3" style={{ background: 'rgba(0, 112, 243, 0.1)', color: '#0070f3' }}>
+              {platform === 'wave1' ? 'CONCORSO WAVE 1' : `Engagement ${platform.toUpperCase()}`}
+            </div>
             <h1 className="h1-premium mb-0">Penny Social Hub</h1>
-            <p className="text-secondary lead mt-2">Raccolta commenti e gestione estrazioni &bull; Aprile - Giugno</p>
+            <p className="text-secondary lead mt-2">
+              {platform === 'wave1' ? 'Il Prodotto Misterioso - Analisi Commenti' : 'Raccolta commenti e gestione estrazioni • Aprile - Giugno'}
+            </p>
           </div>
           <div className="col-12 col-md-4 text-md-end">
             <button className="btn btn-primary" onClick={handleExportExcel}>

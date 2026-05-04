@@ -43,6 +43,7 @@ function BasicExample() {
               <div className="dropdown-label-custom small opacity-50 px-3 py-1">SOCIAL HUB</div>
               <NavDropdown.Item href="/penny-facebook">Facebook Commenti</NavDropdown.Item>
               <NavDropdown.Item href="/penny-instagram">Instagram Commenti</NavDropdown.Item>
+              <NavDropdown.Item href="/penny-wave1">Il Prodotto Misterioso (W1)</NavDropdown.Item>
             </NavDropdown>
 
             <NavDropdown title="Archivio" id="archive-nav-dropdown" className="ms-lg-4">

@@ -23,6 +23,7 @@ export default function App() {
           <Route path="/eurobet-instagram" element={<ProtectedRoute><EurobetDashboard /></ProtectedRoute>} />
           <Route path="/penny-facebook" element={<ProtectedRoute><PennyDashboard platform="facebook" /></ProtectedRoute>} />
           <Route path="/penny-instagram" element={<ProtectedRoute><PennyDashboard platform="instagram" /></ProtectedRoute>} />
+          <Route path="/penny-wave1" element={<ProtectedRoute><PennyDashboard platform="wave1" /></ProtectedRoute>} />
           <Route path="/FbPost" element={<ProtectedRoute><FbPost /></ProtectedRoute>} />
           <Route path="/IgPost" element={<ProtectedRoute><IgPost /></ProtectedRoute>} />
           <Route path="/IgComment" element={<ProtectedRoute><IgComment /></ProtectedRoute>} />
