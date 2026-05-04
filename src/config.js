@@ -7,6 +7,7 @@ const config = {
     eurobetWave1Path: "/data/eurobet-wave1.json",
     eurobetWave2Path: "/data/eurobet_wave2.json",
     eurobetWave3Path: "/data/eurobet_wave3.json",
+    eurobetMasterPath: "/data/eurobet_master.json",
 
     pennyDataPath: "/data/fbcomment.json",
     pennyWave1Path: "/data/penny_wave1.json",

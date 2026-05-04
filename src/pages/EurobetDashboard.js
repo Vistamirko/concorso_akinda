@@ -5,52 +5,48 @@ import { useTable } from "react-table";
 import config from "../config";
 
 const columns = [
-  { Header: "Nome Utente", accessor: "fullName", Cell: ({value}) => <span className="fw-bold">{value}</span> },
-  { Header: "Data Pubblicazione", accessor: "timestamp", Cell: ({value}) => <span className="opacity-50 small">{value || "N/D"}</span> },
-  { Header: "Contenuto Post", accessor: "caption", Cell: ({value}) => <div className="text-truncate" style={{maxWidth: '400px'}}>{value}</div> },
-  { Header: "Link Post", accessor: "url", Cell: ({value}) => <a href={value} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-light border-opacity-10 py-1 px-3" style={{fontSize: '0.7rem'}}>VEDI SU IG</a> },
+    { 
+        Header: "Nome Utente", 
+        accessor: "username", 
+        Cell: ({row}) => (
+            <div className="d-flex flex-column">
+                <span className="fw-bold text-white">{row.original.username}</span>
+                <span className="text-secondary small opacity-75">{row.original.fullName || ""}</span>
+            </div>
+        )
+    },
+    { Header: "Data Pubblicazione", accessor: "pubDate", Cell: ({value}) => <span className="opacity-50 small">{value || "N/D"}</span> },
+    { Header: "Contenuto Post", accessor: "description", Cell: ({value}) => <div className="text-truncate" style={{maxWidth: '400px'}}>{value}</div> },
+    { Header: "Link Post", accessor: "postUrl", Cell: ({value}) => <a href={value} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-light border-opacity-10 py-1 px-3" style={{fontSize: '0.7rem'}}>VEDI SU IG</a> },
 ];
 
 function EurobetDashboard() {
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const paths = [config.eurobetWave2Path, config.eurobetWave3Path];
-        let allData = [];
-
-        for (const path of paths) {
-          try {
-            let response = await fetch(path);
-            if (!response.ok) {
-              response = await fetch(`${config.s3BaseUrl}${path}`);
-            }
-            
-            if (response.ok) {
-              const jsonData = await response.json();
-              if (Array.isArray(jsonData)) {
-                allData = [...allData, ...jsonData];
-              }
-            }
-          } catch (err) {
-            console.warn(`Errore nel caricamento di ${path}:`, err);
-          }
+        let response = await fetch(config.eurobetMasterPath);
+        if (!response.ok) {
+          response = await fetch(`${config.s3BaseUrl}${config.eurobetMasterPath}`);
         }
-
-        setData(allData);
+        
+        if (response.ok) {
+          const jsonData = await response.json();
+          setData(Array.isArray(jsonData) ? jsonData : []);
+        }
       } catch (e) {
-        console.warn("Unable to load Eurobet data:", e);
+        console.warn("Unable to load Eurobet master data:", e);
         setData([]);
       }
     };
     fetchData();
   }, []);
 
-
   const filteredData = useMemo(() => {
     return data.filter(item => {
-      const desc = (item.caption || "").toLowerCase();
+      const desc = (item.description || "").toLowerCase();
       const hasHashtags = desc.includes("#sentilapassionedalvivo") && 
                           desc.includes("#accettoregolamento") && 
                           desc.includes("#accettoprivacypolicy");
@@ -59,8 +55,9 @@ function EurobetDashboard() {
       
       const search = searchTerm.toLowerCase();
       return hasHashtags && (
+        (item.username || "").toLowerCase().includes(search) ||
         (item.fullName || "").toLowerCase().includes(search) ||
-        (item.caption || "").toLowerCase().includes(search)
+        (item.description || "").toLowerCase().includes(search)
       );
     });
   }, [data, searchTerm]);
@@ -71,22 +68,19 @@ function EurobetDashboard() {
   });
 
   const handleExportExcel = () => {
-    // Genera un file Excel compatibile usando il formato Tab-Separated Values (UTF-16LE)
-    // Questo è il modo più affidabile per far sì che Excel lo apra correttamente come spreadsheet
-    const headers = ["ID", "Utente", "Data Pubblicazione", "Didascalia", "URL"];
+    const headers = ["Utente", "Nome Completo", "Data Pubblicazione", "Didascalia", "URL"];
     const rows = filteredData.map(p => [
-      p.id || "",
-      p.fullName || p.username || "",
-      p.timestamp || "",
-      (p.caption || "").replace(/\n/g, " "),
-      p.url || ""
+      p.username || "",
+      p.fullName || "",
+      p.pubDate || "",
+      (p.description || "").replace(/\n/g, " "),
+      p.postUrl || ""
     ]);
 
     const content = [headers, ...rows]
       .map(row => row.join("\t"))
       .join("\n");
 
-    // Codifica in UTF-16LE con BOM per far capire a Excel che è un file di dati
     const buffer = new ArrayBuffer(content.length * 2 + 2);
     const view = new DataView(buffer);
     view.setUint16(0, 0xFEFF, true); // BOM
@@ -111,9 +105,9 @@ function EurobetDashboard() {
         
         <div className="row align-items-end mb-5 pt-4">
           <div className="col-12 col-md-8">
-            <div className="badge-premium mb-3" style={{ background: 'rgba(0, 132, 255, 0.1)', color: '#0084ff' }}>Eurobet Wave 2-4</div>
+            <div className="badge-premium mb-3" style={{ background: 'rgba(0, 132, 255, 0.1)', color: '#0084ff' }}>Eurobet Wave 4</div>
             <h1 className="h1-premium mb-0">Eurobet Social Hub</h1>
-            <p className="text-secondary lead mt-2">Monitoraggio avanzato hashtag &bull; Wave 2, 3, 4</p>
+            <p className="text-secondary lead mt-2">Monitoraggio avanzato hashtag &bull; Wave 4 (Oggi)</p>
           </div>
           <div className="col-12 col-md-4 text-md-end">
             <button className="btn btn-primary" onClick={handleExportExcel}>
@@ -130,7 +124,7 @@ function EurobetDashboard() {
                         <input 
                             type="text" 
                             className="form-control bg-transparent border-0 text-white shadow-none search-input" 
-                            placeholder="Cerca per nome utente o didascalia (filtrato per validità)..." 
+                            placeholder="Cerca per nome utente, nome reale o didascalia..." 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -149,13 +143,13 @@ function EurobetDashboard() {
             <div className="col-md-3">
                 <div className="glass-card text-center py-4">
                     <div className="text-secondary small fw-bold tracking-widest text-uppercase mb-2">Post Unici</div>
-                    <div className="h1-premium mb-0" style={{ fontSize: '2.5rem' }}>{new Set(filteredData.map(i => i.url)).size}</div>
+                    <div className="h1-premium mb-0" style={{ fontSize: '2.5rem' }}>{new Set(filteredData.map(i => i.postUrl)).size}</div>
                 </div>
             </div>
             <div className="col-md-3">
                 <div className="glass-card text-center py-4">
                     <div className="text-secondary small fw-bold tracking-widest text-uppercase mb-2">Utenti Unici</div>
-                    <div className="h1-premium mb-0" style={{ fontSize: '2.5rem' }}>{new Set(filteredData.map(i => i.fullName)).size}</div>
+                    <div className="h1-premium mb-0" style={{ fontSize: '2.5rem' }}>{new Set(filteredData.map(i => i.username)).size}</div>
                 </div>
             </div>
             <div className="col-md-3">
