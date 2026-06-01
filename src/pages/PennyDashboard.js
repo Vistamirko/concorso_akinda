@@ -17,6 +17,8 @@ function PennyDashboard({ platform }) {
         let dataPath = config.pennyDataPath;
         if (platform === "instagram") dataPath = config.igCommentPath;
         if (platform === "wave1") dataPath = config.pennyWave1Path;
+        if (platform === "wave2-facebook") dataPath = config.pennyWave2FbPath;
+        if (platform === "wave2-instagram") dataPath = config.pennyWave2IgPath;
 
         let response = await fetch(dataPath);
         if (!response.ok) {
@@ -37,7 +39,7 @@ function PennyDashboard({ platform }) {
 
   // Dynamic columns based on platform schema
   const columns = useMemo(() => {
-    if (platform === 'facebook') {
+    if (platform === 'facebook' || platform === 'wave2-facebook') {
       return [
         { Header: "Nome Utente", accessor: "Name", Cell: ({value}) => <span className="fw-bold">{value}</span> },
         { Header: "Data e Ora", accessor: "Data", Cell: ({value}) => <span className="opacity-50 small">{value}</span> },
@@ -70,7 +72,7 @@ function PennyDashboard({ platform }) {
 
   const handleExportExcel = () => {
     // Genera un file Excel compatibile usando il formato Tab-Separated Values (UTF-16LE)
-    const headers = platform === 'facebook' 
+    const headers = (platform === 'facebook' || platform === 'wave2-facebook') 
       ? ["Utente", "Data", "Commento"]
       : ["Utente", "Data", "Commento", "URL"];
       
@@ -80,7 +82,7 @@ function PennyDashboard({ platform }) {
         p.Date || p.Data || "",
         ((p.CommentText || p.Comment) || "").replace(/\n/g, " ")
       ];
-      if (platform === 'instagram') {
+      if (platform === 'instagram' || platform === 'wave2-instagram' || platform === 'wave1') {
         row.push(p.ProfileURL || p.Id || "");
       }
       return row;
@@ -120,11 +122,11 @@ function PennyDashboard({ platform }) {
         <div className="row align-items-end mb-5 pt-4">
           <div className="col-12 col-md-8">
             <div className="badge-premium mb-3" style={{ background: 'rgba(0, 112, 243, 0.1)', color: '#0070f3' }}>
-              {platform === 'wave1' ? 'CONCORSO WAVE 1' : `Engagement ${platform.toUpperCase()}`}
+              {platform.includes('wave') ? `CONCORSO ${platform.toUpperCase().replace('-', ' ')}` : `Engagement ${platform.toUpperCase()}`}
             </div>
             <h1 className="h1-premium mb-0">Penny Social Hub</h1>
             <p className="text-secondary lead mt-2">
-              {platform === 'wave1' ? 'Il Prodotto Misterioso - Analisi Commenti' : 'Raccolta commenti e gestione estrazioni • Aprile - Giugno'}
+              {platform.includes('wave') ? 'Il Prodotto Misterioso - Partecipanti Validi' : 'Raccolta commenti e gestione estrazioni • Aprile - Giugno'}
             </p>
             {platform === 'instagram' && (
               <p className="small text-secondary">

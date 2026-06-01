@@ -11,6 +11,8 @@ const config = {
 
     pennyDataPath: "/data/fbcomment.json",
     pennyWave1Path: "/data/penny_wave1.json",
+    pennyWave2FbPath: "/data/penny_wave_latest_fb.json",
+    pennyWave2IgPath: "/data/penny_wave_latest_ig.json",
     
     // Altri percorsi per archivi storici
     igCommentPath: "/data/igcomment.json",
