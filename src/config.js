@@ -13,6 +13,8 @@ const config = {
     pennyWave1Path: "/data/penny_wave1.json",
     pennyWave2FbPath: "/data/penny_wave_latest_fb.json",
     pennyWave2IgPath: "/data/penny_wave_latest_ig.json",
+    pennyWaveRawFbPath: "/data/penny_wave_raw_fb.json",
+    pennyWaveRawIgPath: "/data/penny_wave_raw_ig.json",
     
     // Altri percorsi per archivi storici
     igCommentPath: "/data/igcomment.json",

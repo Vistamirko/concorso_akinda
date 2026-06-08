@@ -57,7 +57,7 @@ function parseCSV(csvText) {
 
 function processFacebook() {
     const inputPath = path.join(__dirname, '../src/data/export_20260608-050429.csv');
-    const outputPath = path.join(__dirname, '../public/data/penny_wave_latest_fb.json');
+    const outputPath = path.join(__dirname, '../public/data/penny_wave_raw_fb.json');
     
     if (!fs.existsSync(inputPath)) {
         console.error("Facebook input not found at", inputPath);
@@ -84,13 +84,11 @@ function processFacebook() {
         
         if (!name) continue;
         
-        if (isCommentValid(comment)) {
-            results.push({
-                Name: name,
-                Data: date,
-                Comment: comment
-            });
-        }
+        results.push({
+            Name: name,
+            Data: date,
+            Comment: comment
+        });
     }
     
     fs.writeFileSync(outputPath, JSON.stringify(results, null, 2));
@@ -99,7 +97,7 @@ function processFacebook() {
 
 function processInstagram() {
     const inputPath = path.join(__dirname, '../src/data/result-instagram.csv');
-    const outputPath = path.join(__dirname, '../public/data/penny_wave_latest_ig.json');
+    const outputPath = path.join(__dirname, '../public/data/penny_wave_raw_ig.json');
     
     if (!fs.existsSync(inputPath)) {
         console.error("Instagram input not found at", inputPath);
@@ -124,14 +122,12 @@ function processInstagram() {
         
         if (!username) continue;
         
-        if (isCommentValid(comment)) {
-            results.push({
-                Username: username,
-                Date: date,
-                CommentText: comment,
-                ProfileURL: profileUrl
-            });
-        }
+        results.push({
+            Username: username,
+            Date: date,
+            CommentText: comment,
+            ProfileURL: profileUrl
+        });
     }
     
     fs.writeFileSync(outputPath, JSON.stringify(results, null, 2));

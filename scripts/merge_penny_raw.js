@@ -46,7 +46,7 @@ function parseCSV(csvText) {
 
 function mergeFacebook() {
     const oldPath = path.join(__dirname, '../public/data/fbcomment.json');
-    const newPath = path.join(__dirname, '../src/data/export_20260601-063139.csv');
+    const newPath = path.join(__dirname, '../src/data/export_20260608-050429.csv');
     
     let oldData = [];
     if (fs.existsSync(oldPath)) {
@@ -95,7 +95,7 @@ function mergeFacebook() {
 
 function mergeInstagram() {
     const oldPath = path.join(__dirname, '../public/data/igcomment.json');
-    const newPath = path.join(__dirname, '../src/data/result-penny.json');
+    const newPath = path.join(__dirname, '../src/data/result-instagram.csv');
     
     let oldData = [];
     if (fs.existsSync(oldPath)) {
@@ -109,14 +109,24 @@ function mergeInstagram() {
     let newData = [];
     if (fs.existsSync(newPath)) {
         try {
-            const raw = JSON.parse(fs.readFileSync(newPath, 'utf8'));
-            for (const item of raw) {
-                if (item.username) {
+            const csvData = fs.readFileSync(newPath, 'utf8');
+            const rows = parseCSV(csvData);
+            // Skip header
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (row.length < 7) continue;
+                
+                const username = (row[1] || '').trim();
+                const profileUrl = (row[2] || '').trim();
+                const comment = (row[3] || '').trim();
+                const date = (row[6] || '').trim();
+                
+                if (username) {
                     newData.push({
-                        Username: item.username,
-                        Date: item.commentDate || item.timestamp,
-                        CommentText: item.comment || item.commentText,
-                        ProfileURL: item.profileUrl
+                        Username: username,
+                        Date: date,
+                        CommentText: comment,
+                        ProfileURL: profileUrl
                     });
                 }
             }

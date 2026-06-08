@@ -40,10 +40,13 @@ function BasicExample() {
             </NavDropdown>
 
             <NavDropdown title="Penny" id="penny-nav-dropdown" className="mx-lg-2">
-              <div className="dropdown-label-custom small opacity-50 px-3 py-1">SOCIAL HUB</div>
-              <NavDropdown.Item href="/penny-facebook">Facebook Commenti</NavDropdown.Item>
-              <NavDropdown.Item href="/penny-instagram">Instagram Commenti</NavDropdown.Item>
-              <NavDropdown.Item href="/penny-wave1">Il Prodotto Misterioso (W1)</NavDropdown.Item>
+              <div className="dropdown-label-custom small opacity-50 px-3 py-1">ESTRAZIONE WAVE 2 (PULITI)</div>
+              <NavDropdown.Item href="/penny-wave2-facebook">Facebook Commenti (Validi)</NavDropdown.Item>
+              <NavDropdown.Item href="/penny-wave2-instagram">Instagram Commenti (Validi)</NavDropdown.Item>
+              <NavDropdown.Divider />
+              <div className="dropdown-label-custom small opacity-50 px-3 py-1">RAW DATA (NON PULITI)</div>
+              <NavDropdown.Item href="/penny-wave2-raw-facebook">FB Raw Data (Tutti i commenti)</NavDropdown.Item>
+              <NavDropdown.Item href="/penny-wave2-raw-instagram">IG Raw Data (Tutti i commenti)</NavDropdown.Item>
             </NavDropdown>
 
             <NavDropdown title="Archivio" id="archive-nav-dropdown" className="ms-lg-4">
